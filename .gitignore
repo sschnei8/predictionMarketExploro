@@ -9,6 +9,7 @@ wheels/
 *.env
 *.parquet
 *.DS_Store
+*.csv
 
 # Virtual environments
 .venv
