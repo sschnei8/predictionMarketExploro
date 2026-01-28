@@ -4,9 +4,10 @@ import math
 
 def calculate_fees(C, P):
     """
-    Calculate taker fees from: https://kalshi.com/docs/kalshi-fee-schedule.pdf
+    Calculate maker fees from: https://kalshi.com/docs/kalshi-fee-schedule.pdf
+    1/4 of taker fees 0.0175 instead of 0.07
     """
-    raw_fee = 0.07 * C * P * (1 - P)
+    raw_fee = 0.0175 * C * P * (1 - P)
     fees = math.ceil(raw_fee * 100) / 100
     return fees
 
@@ -51,7 +52,7 @@ for i, (P1, P2) in enumerate(P_pairs):
 
 ax_main.set_xlabel('C (# of Contracts)', fontsize=13, fontweight='bold')
 ax_main.set_ylabel('Fees ($)', fontsize=13, fontweight='bold')
-ax_main.set_title('Fees vs C: Symmetric Around P = 0.5\nFormula: fees = round_up(0.07 × C × P × (1-P))', 
+ax_main.set_title('Fees vs C: Symmetric Around P = 0.5\nFormula: fees = round_up(0.0175 × C × P × (1-P))', 
                   fontsize=15, fontweight='bold', pad=20)
 ax_main.legend(loc='upper left', fontsize=10, framealpha=0.95)
 ax_main.grid(True, alpha=0.3)
