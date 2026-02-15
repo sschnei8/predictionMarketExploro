@@ -4,15 +4,21 @@ SELECT
     CASE 
         -- NEGATIVE SIDE (Losses)
         WHEN balance < -100000 THEN 'a. Loss < -$100k'
-        WHEN balance < -10000  THEN 'b. Loss -$100k to -$10k'
-        WHEN balance < -1000   THEN 'c. Loss -$10k to -$1k'
-        WHEN balance <= 0      THEN 'd. Loss -$1k to $0'
+        WHEN balance <= -10000 THEN 'b. Loss -$100k to -$10k'
+        WHEN balance <= -1000  THEN 'c. Loss -$10k to -$1k'
+        WHEN balance <= -750   THEN 'd. Loss -$1k to -$750'
+        WHEN balance <= -500   THEN 'e. Loss -$750 to -$500'
+        WHEN balance <= -250   THEN 'f. Loss -$500 to -$250'
+        WHEN balance <= 0      THEN 'g. Loss -$250 to $0'
         
         -- POSITIVE SIDE (Profits)
-        WHEN balance <= 1000   THEN 'e. Profit $0 to $1k'
-        WHEN balance <= 10000  THEN 'f. Profit $1k to $10k'
-        WHEN balance <= 100000 THEN 'g. Profit $10k to $100k'
-        ELSE                        'h. Profit > $100k'
+        WHEN balance <= 250   THEN 'h. Profit $0 to $250'
+        WHEN balance <= 500   THEN 'i. Profit $250 to $500'
+        WHEN balance <= 750   THEN 'j. Profit $500 to $750'
+        WHEN balance <= 1000   THEN 'k. Profit $750 to $1k'
+        WHEN balance <= 10000  THEN 'l. Profit $1k to $10k'
+        WHEN balance <= 100000 THEN 'm. Profit $10k to $100k'
+        ELSE                        'n. Profit > $100k'
     END AS profit_bucket,
     COUNT(*) AS users_count,
     SUM(balance) AS total_pnl_in_bucket
