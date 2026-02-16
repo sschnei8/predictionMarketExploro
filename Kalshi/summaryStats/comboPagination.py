@@ -8,13 +8,13 @@ import pyarrow.parquet as pq
 import json
 
 
-def save_cursor(cursor, cursor_file='pagination_cursor.json'):
+def save_cursor(cursor, cursor_file='pagination_combo_cursor.json'):
     """Save the current cursor to a file for recovery"""
     with open(cursor_file, 'w') as f:
         json.dump({'cursor': cursor, 'timestamp': datetime.now().isoformat()}, f)
 
 
-def load_cursor(cursor_file='pagination_cursor.json'):
+def load_cursor(cursor_file='pagination_combo_cursor.json'):
     """Load the last saved cursor if it exists"""
     if os.path.exists(cursor_file):
         with open(cursor_file, 'r') as f:
@@ -24,7 +24,7 @@ def load_cursor(cursor_file='pagination_cursor.json'):
     return None
 
 
-def save_last_run_metadata(filename='kalshi_markets_metadata.json'):
+def save_last_run_metadata(filename='kalshi_markets_combo_metadata.json'):
     """Save metadata about the last successful run"""
     metadata = {
         'last_run_timestamp': datetime.now().isoformat(),
@@ -35,7 +35,7 @@ def save_last_run_metadata(filename='kalshi_markets_metadata.json'):
     print(f"Saved run metadata: {metadata['last_run_timestamp']}")
 
 
-def load_last_run_metadata(filename='kalshi_markets_metadata.json'):
+def load_last_run_metadata(filename='kalshi_markets_combo_metadata.json'):
     """Load metadata from the last successful run"""
     if os.path.exists(filename):
         with open(filename, 'r') as f:
@@ -65,7 +65,7 @@ def make_request_with_retry(url, max_retries=5, initial_backoff=1.0):
                     backoff *= 2  # Exponential backoff
                     continue
                 else:
-                    raise Exception(f"Persistent 502 Bad Gateway after {max_retries} attempts.")
+                    raise Exception(f"Persistent 502 Bad Gateway after {max_retries} attempts. API may be down.")
 
             # Other HTTP errors - fail immediately
             else:
@@ -92,9 +92,9 @@ def make_request_with_retry(url, max_retries=5, initial_backoff=1.0):
     raise Exception(f"Failed to complete request after {max_retries} attempts")
 
 
-def get_all_markets_batched(filename='kalshi_markets.parquet', batch_size=10000, cursor_file='pagination_cursor.json',
-                           resume=False, incremental=False, metadata_file='kalshi_markets_metadata.json'):
-    """Fetch all markets from Kalshi API with pagination, rate limiting, and batch writing to disk
+def get_all_markets_batched(filename='kalshi_combo_markets.parquet', batch_size=10000, cursor_file='pagination_combo_cursor.json',
+                           resume=False, incremental=False, metadata_file='kalshi_markets_combo_metadata.json'):
+    """Fetch all combo markets from the Kalshi API with pagination, rate limiting, and batch writing to disk
 
     Args:
         filename: Output parquet file name
@@ -107,6 +107,7 @@ def get_all_markets_batched(filename='kalshi_markets.parquet', batch_size=10000,
     batch = []
     cursor = None
     base_url = "https://api.elections.kalshi.com/trade-api/v2/markets"
+    mve_filter='only'
     limit = 1000
     request_count = 0
     start_time = time.time()
@@ -146,9 +147,10 @@ def get_all_markets_batched(filename='kalshi_markets.parquet', batch_size=10000,
             os.remove(cursor_file)
             print(f"Removed existing {cursor_file}")
 
+
     try:
         while True:
-            url = f"{base_url}?limit={limit}" # Can add status=open qualifier here ~159K markets
+            url = f"{base_url}?limit={limit}&mve_filter={mve_filter}" #Add MVE filter
             if cursor:
                 url += f"&cursor={cursor}"
             if min_created_ts:
@@ -202,12 +204,14 @@ def get_all_markets_batched(filename='kalshi_markets.parquet', batch_size=10000,
 
         # In append mode, merge the temporary file with the existing file
         if append_mode and writer is not None:
+            # Close writer before merging
             writer.close()
             writer = None
 
             temp_filename = filename.replace('.parquet', '_temp.parquet')
             if os.path.exists(temp_filename):
                 print(f"Merging new markets with existing file...")
+                # Read both files
                 existing_df = pd.read_parquet(filename)
                 new_df = pd.read_parquet(temp_filename)
 
@@ -282,7 +286,7 @@ if __name__ == "__main__":
     print("Starting to fetch Kalshi markets...")
     start = time.time()
 
-    filename = 'kalshi_markets.parquet'
+    filename = 'kalshi_combo_markets.parquet'
 
     # Three modes of operation:
     # 1. Fresh start (resume=False, incremental=False) - fetches all markets from scratch
