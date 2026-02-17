@@ -2,7 +2,7 @@ import duckdb
 
 con = duckdb.connect()
 
-print("\n=== Query 7: SPORTS ===")
+print("\n=== === === Sports Market Percentage === === ===")
 result7 = con.execute("""
 WITH CHECK123 AS (
     SELECT CASE WHEN EVENT_TICKER ILIKE '%KXMVESPORTSMULTIGAMEEXTENDED%' THEN 'Parlay'
@@ -132,14 +132,14 @@ WITH CHECK123 AS (
                 WHEN EVENT_TICKER ILIKE '%KXVTBGAME%' THEN 'Other Sports'
                 WHEN EVENT_TICKER ILIKE '%KXWPLGAME%' THEN 'Other Sports'
                 ELSE 'LIKELY NOT SPORTS' END AS MKT_TYPE
-        , SUM(volume) as total_volume_per_market
+        , SUM(volume) as Total_Volume
         , COUNT(1) as NUM_MKTS
                     
                
                       
     FROM 'kalshi_markets.parquet'
     GROUP BY 1
-    ORDER BY total_volume_per_market DESC
+    ORDER BY Total_Volume DESC
 ),
                       
 TotalVolumeAllMarkets AS (
@@ -147,9 +147,9 @@ TotalVolumeAllMarkets AS (
     FROM 'kalshi_markets.parquet'
 )
                       
-SELECT C.MKT_TYPE
-     , C.total_volume_per_market::DECIMAL AS total_volume_per_market
-     , C.total_volume_per_market::FLOAT / T.NET_TOTAL_VOLUME AS VOLUME_PCT
+SELECT C.MKT_TYPE as Market_Type
+     , C.Total_Volume::DECIMAL AS Total_Volume
+     , ROUND((C.Total_Volume::FLOAT / T.NET_TOTAL_VOLUME)*100, 2)::VARCHAR || '%' AS Volume_PCT
 FROM CHECK123 C
     LEFT JOIN TotalVolumeAllMarkets T ON 1=1
 """).df()
