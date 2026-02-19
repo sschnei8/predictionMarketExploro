@@ -6,13 +6,13 @@ def calculate_total_fees(volume, p):
     """
     Calculate total fees (maker + taker) for a given volume and probability.
 
-    Formula: fee = (0.0175 * (volume * .5) * p(1-p)) + (0.07 * (volume * .5) * p(1-p))
+    Formula: fee = (0.0175 * volume * p(1-p)) + (0.07 * volume * p(1-p))
 
     Where:
     - 0.0175 = maker fee rate (1.75%)
     - 0.07 = taker fee rate (7%)
     """
-    return (0.0175 * (volume * 0.5) * p * (1 - p)) + (0.07 * (volume * 0.5) * p * (1 - p))
+    return (0.0175 * volume  * p * (1 - p)) + (0.07 * volume * p * (1 - p))
 
 # Fixed total volume: $40 billion in contracts
 TOTAL_VOLUME = 40_000_000_000
