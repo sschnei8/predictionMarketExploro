@@ -27,8 +27,8 @@ gs = fig.add_gridspec(1, 2, hspace=0.3, wspace=0.3)
 
 # Fee breakdown by component
 ax_breakdown = fig.add_subplot(gs[0, 0])
-maker_fees = [0.0175 * (TOTAL_VOLUME * 0.5) * p * (1-p) for p in P_values]
-taker_fees = [0.07 * (TOTAL_VOLUME * 0.5) * p * (1-p) for p in P_values]
+maker_fees = [0.0175 * (TOTAL_VOLUME) * p * (1-p) for p in P_values]
+taker_fees = [0.07 * (TOTAL_VOLUME) * p * (1-p) for p in P_values]
 
 ax_breakdown.plot(P_values, maker_fees, linewidth=2.5, color='blue', label='Maker Fees')
 ax_breakdown.plot(P_values, taker_fees, linewidth=2.5, color='orange', label='Taker Fees')
@@ -52,8 +52,8 @@ stats_data = []
 
 for p in p_values_of_interest:
     total = calculate_total_fees(TOTAL_VOLUME, p)
-    maker = 0.0175 * (TOTAL_VOLUME * 0.5) * p * (1-p)
-    taker = 0.07 * (TOTAL_VOLUME * 0.5) * p * (1-p)
+    maker = 0.0175 * (TOTAL_VOLUME) * p * (1-p)
+    taker = 0.07 * (TOTAL_VOLUME) * p * (1-p)
     stats_data.append([f'{p:.1f}', f'${total/1e9:.3f}B', f'${maker/1e9:.3f}B', f'${taker/1e9:.3f}B'])
 
 # Create table
