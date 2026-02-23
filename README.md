@@ -9,3 +9,11 @@ This is a series of haphazard scripts that are useful for specific data points t
 ### Some of the Outputs
 
 ![Total Rev](Kalshi/visualizations/total_fee_rev_calc/total_revenue_chart.png)
+
+![Sports %](Kalshi/visualizations/sports/market_type_volume_chart.png)
+
+![Overall](Kalshi/visualizations/overall_stats/weekly_overview_chart.png)
+
+![Imp Prob](Kalshi/visualizations/implied_probability/implied_prob_chart.png)
+
+![Contracts per trade](Kalshi/visualizations/contracts_per_trade/contracts_per_trade.png)
