@@ -10,6 +10,7 @@ COPY (
         SUM(count)::FLOAT / COUNT(*) AS contracts_per_trade,
         MEDIAN(count) median_contracts_per_trade
     FROM '/Users/iamsam/WorkingFiles/PredictionMarkets/Kalshi/summaryStats/kalshi_trades.parquet'
+    WHERE MONTH >= '2023-01-01'
     GROUP BY MONTH
     ORDER BY MONTH ASC
 ) TO contracts_per_trade_data.csv (HEADER, DELIMITER ',');

@@ -32,7 +32,7 @@ x_pos  = np.arange(n)
 BG      = "#0a0a0f"
 SURFACE = "#111118"
 BORDER  = "#1e1e2e"
-MUTED   = "#5a5a78"
+MUTED   = "#aaaabc"
 
 # Softer, muted teal-to-slate palette — no near-whites, all tones readable on dark
 BAND_COLORS = {
@@ -162,5 +162,5 @@ fig.text(0.98, 0.97, "Monthly · Prediction Markets",
          ha="right", va="top", color=MUTED, fontsize=8, fontfamily="monospace")
 
 plt.tight_layout(rect=[0, 0, 1, 0.97])
-plt.savefig("implied_prob_chart.png", dpi=1080, bbox_inches="tight", facecolor=BG)
+plt.savefig("implied_prob_chart.png", dpi=300, bbox_inches="tight", facecolor=BG)
 print("saved → implied_prob_chart.png")

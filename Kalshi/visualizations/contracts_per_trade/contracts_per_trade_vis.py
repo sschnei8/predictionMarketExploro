@@ -13,15 +13,18 @@ raw['MONTH'] = pd.to_datetime(raw['MONTH'])
 
 dates  = raw['MONTH'].tolist()
 cpt    = raw['contracts_per_trade'].tolist()
+cptvals = raw['contracts_per_trade'].values.astype(int)
 median = raw['median_contracts_per_trade'].tolist()
-n      = len(dates)
+n = len(dates)
+x = np.arange(n)
 
 # ── Colors ────────────────────────────────────────────────────────────────────
 BG       = "#0a0a0f"
 SURFACE  = "#111118"
 BORDER   = "#1e1e2e"
 TEXT     = "#e8e8f0"
-MUTED    = "#5a5a78"
+MUTED    = "#aaaabc"
+DOT_COLOR = "#f0b07a"
 
 # deep plum → dusty rose (matches JS colorScale)
 cmap = mcolors.LinearSegmentedColormap.from_list(
@@ -47,6 +50,34 @@ bars = ax.bar(x_pos, cpt, color=bar_cols, width=0.75, zorder=3, linewidth=0)
 for xi, yi, col in zip(x_pos, cpt, bar_cols):
     ax.plot([xi - 0.375, xi + 0.375], [yi, yi],
             color=col, linewidth=1.2, solid_capstyle="round", zorder=4)
+    
+# ── Total contracts inside / above each bar ────────────────────────────────────
+y_ceil = cptvals.max() * 1.30
+ax.set_ylim(0, y_ceil)
+
+# Threshold: if bar is tall enough to fit text inside, put it inside; else above
+MIN_INSIDE = y_ceil * 0.055   # ~5.5% of axis height
+
+for xi, yi, col in zip(x, cpt, bar_cols):
+    if yi >= 1e6:
+        lbl = f"{yi/1e6:.1f}M"
+    elif yi >= 1e3:
+        lbl = f"{yi/1e3:.0f}K"
+    else:
+        lbl = f"{yi:.0f}"
+
+    if yi >= MIN_INSIDE:
+        # Inside near the top of the bar
+        ax.text(xi, yi - y_ceil * 0.015, lbl,
+                ha="center", va="top",
+                color=DOT_COLOR, fontsize=5.5, fontfamily="monospace",
+                fontweight="bold", zorder=5)
+    else:
+        # Above the bar
+        ax.text(xi, yi + y_ceil * 0.012, lbl,
+                ha="center", va="bottom",
+                color=DOT_COLOR, fontsize=5.5, fontfamily="monospace",
+                zorder=5)
 
 # ── Median line overlay ───────────────────────────────────────────────────────
 MEDIAN_COLOR = "#c8a96e"  # warm gold — same as dashboard accent1
@@ -124,10 +155,10 @@ leg = ax.legend(
 )
 for text in leg.get_texts():
     text.set_fontfamily("monospace")
-fig.text(0.985, 0.97, "Jun 2021 – Feb 2026",
+fig.text(0.985, 0.97, "Jan 2023 – Feb 2026",
          ha="right", va="top", color=MUTED, fontsize=8, fontfamily="monospace")
 
 plt.tight_layout(rect=[0, 0, 1, 0.97])
 plt.savefig("contracts_per_trade.png",
-            dpi=1080, bbox_inches="tight", facecolor=BG)
+            dpi=300, bbox_inches="tight", facecolor=BG)
 print("saved")
